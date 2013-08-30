@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>MyValidate</title>
+</head>
+<body>
+    <div class="notification" style="display: none;"></div>
+    <form action="" class="myValidate">
+        <input type="text" name="name" data-myrules="required">
+        <input type="submit" value="Send">
+    </form>
+    <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <script type="text/javascript" src="myValidate.js"></script>
+    <script type="text/javascript">
+    $(function(){
+        $('form').myValidate();
+    });
+    </script>
+</body>
+</html>
