@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>MyValidate</title>
+    <link rel="stylesheet" href="example.css">
+</head>
+<body>
+    <div class="container">
+        <h1 class="top-title">MyValidate</h1>
+        <ul class="top-menu">
+            <li class="item">
+                <a href="example.html" class="lnk">Example</a>
+            </li>
+            <li class="item">
+                <a href="https://github.com/jonasmello/myValidate" target="_blank" class="lnk">GitHub</a>
+            </li>
+        </ul>
+        <form action="" class="myValidate">
+            <div class="notification" style="display: none;"></div>
+            <label>
+                <span class="label-txt">Name:</span>
+                <input type="text" name="name" class="txt-field" data-myrules="required">
+            </label>
+            <label>
+                <span class="label-txt">E-mail:</span>
+                <input type="text" name="email" class="txt-field" data-myrules="required|email">
+            </label>
+            <input type="submit" value="Send">
+        </form>
+    </div>
+    <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <script type="text/javascript" src="myValidate.js"></script>
+    <script type="text/javascript">
+    $(function(){
+        $('form').myValidate();
+    });
+    </script>
+</body>
+</html>
