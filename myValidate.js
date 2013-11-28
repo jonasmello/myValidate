@@ -2,7 +2,7 @@
  *  Project: myValidate
  *  Description: Este plugin foi criado com o intuito de simplificar o processo de validação de formulários via jQuery.
  *  Author: Jonas Mello
- *  License:
+ *  License: MIT
  */
 var callbackSubmit = false;
 // the semi-colon before function invocation is a safety net against concatenated
