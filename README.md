@@ -10,4 +10,4 @@ $(function () {
     $('form').myValidate();
 });
 ```
-[Demo](http://ekg.com.br/ "Demo")
+[Demo](http://ekg.com.br/myValidate "Demo")
