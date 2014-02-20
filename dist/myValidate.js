@@ -25,13 +25,13 @@
   // Static method.
   $.myValidate = function(element, options) {
     this.version = '1.3.1';
-    this.el = element;
+    this.element = element;
     this.callbackSubmit = false; // Utilizado para bloquear o submit do formulário
     this.options = $.extend({}, $.myValidate.options, options);
     this.$form = null;
     this.noValidate = false;
 
-    this.debug('log', this.options);
+    //this.debug('log', this.options);
 
     this.init();
   };
@@ -142,7 +142,7 @@
 
     $(this.element).submit(function(event) {
       self.$form = $(this);
-      if (self.callbackSubmit) {
+      if (!self.callbackSubmit) {
         event.preventDefault();
         self.noValidate = false;
         self.getErrorMessage();
@@ -177,13 +177,14 @@
     $(this.settings.notification).html(message);
   };
 
-  $.myValidate.prototype.getErrorMessage = function() {
-    this.settings.error = this.$form.data('error') || this.settings.error;
-    this.settings.errormail = this.$form.data('errormail') || this.settings.errormail;
-    this.settings.errorattach = this.$form.data('errorattach') || this.settings.errorattach;
-    this.settings.errorcpf = this.$form.data('errorcpf') || this.settings.errorcpf;
-    this.settings.errorcnpj = this.$form.data('errorcnpj') || this.settings.errorcnpj;
-    this.settings.erroequal = this.$form.data('erroequal') || this.settings.erroequal;
+  $.myValidate.prototype.getErrorMessage = function(event) {
+    var self = event ? event.data.self : this;
+    self.settings.error = self.$form.data('error') || self.settings.error;
+    self.settings.errormail = self.$form.data('errormail') || self.settings.errormail;
+    self.settings.errorattach = self.$form.data('errorattach') || self.settings.errorattach;
+    self.settings.errorcpf = self.$form.data('errorcpf') || self.settings.errorcpf;
+    self.settings.errorcnpj = self.$form.data('errorcnpj') || self.settings.errorcnpj;
+    self.settings.erroequal = self.$form.data('erroequal') || self.settings.erroequal;
   };
 
   $.myValidate.prototype.notVal = function(field) {

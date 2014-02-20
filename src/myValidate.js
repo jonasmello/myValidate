@@ -29,13 +29,11 @@
   // Static method.
   $.myValidate = function(element, options) {
     this.version = '1.3.1';
-    this.el = element;
+    this.element = element;
     this.callbackSubmit = false; // Utilizado para bloquear o submit do formulário
     this.options = $.extend({}, $.myValidate.options, options);
-    this.$form = null;
     this.noValidate = false;
-
-    this.debug('log', this.options);
+    this.$form = null;
 
     this.init();
   };
@@ -144,13 +142,13 @@
   $.myValidate.prototype.init = function() {
     var self = this;
 
-    $(this.element).submit(function(event) {
+    $(this.element).on('submit', {self: self} ,function(event) {
       self.$form = $(this);
-      if (self.callbackSubmit) {
+      if (!self.callbackSubmit) {
         event.preventDefault();
         self.noValidate = false;
-        self.getErrorMessage();
-        self.settings.beforeValidate(self.$form);
+        self.getErrorMessage(event);
+        self.options.beforeValidate(self.$form);
         self.getRequireds(this);
       }
     });
@@ -158,7 +156,7 @@
   };
 
   $.myValidate.prototype.getRequireds = function(el) {
-    var self = this, $requireds = $(el).find('[data-myrules^="'+this.settings.required+'"]');
+    var self = this, $requireds = $(el).find('[data-myrules^="'+this.options.required+'"]');
     $(el).find('*').removeClass('error');
     $requireds.each(function(){
       var $this = $(this);
@@ -171,29 +169,30 @@
       self.validateEqual($this);
     });
     if (this.noValidate) {
-        this.settings.callError(this.$form);
+        this.options.callError(this.$form);
     } else {
-        this.settings.callSuccess(this.$form);
+        this.options.callSuccess(this.$form);
     }
   };
 
   $.myValidate.prototype.notification = function(message) {
-    $(this.settings.notification).html(message);
+    $(this.options.notification).html(message);
   };
 
-  $.myValidate.prototype.getErrorMessage = function() {
-    this.settings.error = this.$form.data('error') || this.settings.error;
-    this.settings.errormail = this.$form.data('errormail') || this.settings.errormail;
-    this.settings.errorattach = this.$form.data('errorattach') || this.settings.errorattach;
-    this.settings.errorcpf = this.$form.data('errorcpf') || this.settings.errorcpf;
-    this.settings.errorcnpj = this.$form.data('errorcnpj') || this.settings.errorcnpj;
-    this.settings.erroequal = this.$form.data('erroequal') || this.settings.erroequal;
+  $.myValidate.prototype.getErrorMessage = function(event) {
+    var self = event ? event.data.self : this;
+    self.options.error = self.$form.data('error') || self.options.error;
+    self.options.errormail = self.$form.data('errormail') || self.options.errormail;
+    self.options.errorattach = self.$form.data('errorattach') || self.options.errorattach;
+    self.options.errorcpf = self.$form.data('errorcpf') || self.options.errorcpf;
+    self.options.errorcnpj = self.$form.data('errorcnpj') || self.options.errorcnpj;
+    self.options.erroequal = self.$form.data('erroequal') || self.options.erroequal;
   };
 
   $.myValidate.prototype.notVal = function(field) {
     if (field.val() === '') {
         this.noValidate = true;
-        this.notification(this.settings.error);
+        this.notification(this.options.error);
         field.addClass('error');
         this.notFile(field);
     }
@@ -201,12 +200,12 @@
 
   $.myValidate.prototype.notFile = function(field) {
     if (field.is('input[type="file"]')) {
-      this.notification(this.settings.errorattach);
+      this.notification(this.options.errorattach);
       this.noValidate = true;
       field.parent().addClass('error')
            .find('.label')
            .addClass('error');
-      this.notification(this.settings.errorattach);
+      this.notification(this.options.errorattach);
     }
   };
 
@@ -216,7 +215,7 @@
       if (!expressao_regular.test(field.val())) {
         this.noValidate = true;
         field.addClass('error');
-        this.notification(this.settings.errormail);
+        this.notification(this.options.errormail);
       }
     }
   };
@@ -226,7 +225,7 @@
       if (!this.validarCPF(field.val())) {
         this.noValidate = true;
         field.addClass('error');
-        this.notification(this.settings.errorcpf);
+        this.notification(this.options.errorcpf);
       }
     }
   };
@@ -236,7 +235,7 @@
       if (!this.validarCNPJ(field.val())) {
         this.noValidate = true;
         field.addClass('error');
-        this.notification(this.settings.errorcnpj);
+        this.notification(this.options.errorcnpj);
       }
     }
   };
@@ -244,7 +243,7 @@
   $.myValidate.prototype.validateSelect = function(field) {
     if (field.is('select') && field.val() === ('' || 0)) {
       this.noValidate = true;
-      this.notification(this.settings.error);
+      this.notification(this.options.error);
       field.next('.chzn-container')
            .addClass('error');
     }
@@ -254,7 +253,7 @@
     if (field.is('input[type="checkbox"]') && !field.is('input:checked')) {
       field.parent().addClass('error');
       this.noValidate = true;
-      this.notification(this.settings.errormail);
+      this.notification(this.options.errormail);
     }
   };
 
@@ -266,7 +265,7 @@
         compare = compare.replace(']', '');
         if ($('[name="'+compare+'"]').val() !== field.val()) {
             this.noValidate = true;
-            this.notification(this.settings.erroequal);
+            this.notification(this.options.erroequal);
             field.addClass('error');
             $('[name="'+compare+'"]').addClass('error');
         }
