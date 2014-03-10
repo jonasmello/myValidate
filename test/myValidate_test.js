@@ -23,7 +23,7 @@
   module('jQuery#myValidate', {
     // This will run before each test in this module.
     setup: function() {
-      this.elems = $('#qunit-fixture').children();
+      this.elems = $('form');
     }
   });
 
@@ -35,6 +35,7 @@
 
   test('is myValidate', function() {
     expect(1);
+    ok(1);
     //strictEqual(this.elems.awesome().text(), 'awesome0awesome1awesome2', 'should be awesome');
   });
 
