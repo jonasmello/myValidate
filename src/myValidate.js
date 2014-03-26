@@ -179,9 +179,9 @@
    * @return {void}
    */
   $.myValidate.prototype.elementsOnClick = function() {
-    var self = this, el = 'form' + ((this.element.id.length ? '#' + this.element.id :(this.element.name.length ? '[name="' + this.element.name + '"]':(this.element.className.length ? '.' + this.element.className : ''))));
+    var self = this, el = 'form' + ((self.element.id.length ? '#' + self.element.id :(self.element.name.length ? '[name="' + self.element.name + '"]':(self.element.className.length ? '.' + self.element.className : ''))));
     $(el + ' [onclick*="submit()"]').each(function(key, val) {
-      $(val).attr('onclick', 'javascript:$(\'' + el + '\').myValidate().submit();');
+      $(val).attr('onclick', "javascript:$('" + el + "').myValidate().submit();");
     });
   };
 
@@ -208,6 +208,7 @@
       self.options.beforeValidate(self.$form);
       self.$requireds.each(function(){
         var $this = $(this);
+        $this.removeClass('error');
         self.notVal($this);
         self.validateEmail($this);
         self.validateCpf($this);

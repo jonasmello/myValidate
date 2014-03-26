@@ -1,4 +1,4 @@
-/*! myValidate - v1.0.1 - 2014-02-20
+/*! myValidate - v2.0.0 - 2014-03-26
 * https://github.com/jonasmello/myValidate
 * Copyright (c) 2014 Jonas Mello; Licensed MIT */
 // o ponto-e-vírgula antes de invocar a função é uma prática segura contra scripts
@@ -17,23 +17,36 @@
 
   // Collection method.
   $.fn.myValidate = function(options) {
-    return this.each(function() {
-      $.data(this, 'myValidate', new $.myValidate(this, options));
-    });
+    var myValidate, instance = (typeof options === "object" && options.instance) || false;
+    if (instance) {
+        this.each(function() {
+            myValidate = new $.myValidate(this, options);
+            if ( !$.data( this, 'myValidate' ) ) {
+              $.data(this, 'myValidate', myValidate);
+            }
+        });
+    } else {
+        myValidate = this.each(function() {
+            if ( !$.data( this, 'myValidate' ) ) {
+              $.data(this, 'myValidate', new $.myValidate(this, options));
+            }
+        });
+    }
+    return myValidate;
   };
 
   // Static method.
   $.myValidate = function(element, options) {
-    this.version = '1.3.1';
+    this.version = '2.0.0';
     this.element = element;
-    this.callbackSubmit = false; // Utilizado para bloquear o submit do formulário
+    this.callbackSubmit = true; // Utilizado para bloquear o submit do formulário
     this.options = $.extend({}, $.myValidate.options, options);
-    this.$form = null;
-    this.noValidate = false;
+    this.$form = $(this.element);
+    this.$requireds = this.$form.find('[data-myrules^="'+this.options.required+'"]');
 
-    //this.debug('log', this.options);
-
-    this.init();
+    if (this.element) {
+      this.init();
+    }
   };
 
   // Static method default options.
@@ -52,17 +65,22 @@
       beforeValidate : function() {
       },
       // Função executada quando ha erro
-      callError : function($form){
-          window.console.log($form);
-          $form.find('.notification').slideDown();
+      callError : function(event, el, status){
+        //console.log(el, status);
+        event.preventDefault();
+        el.find('.notification').slideDown();
       },
       // Função executada quando não ha erro
-      callSuccess : function($form){
-          this.callbackSubmit = true;
-          $form.submit();
+      callSuccess : function(event, el, status){
+        //console.log(el, status);
       }
   };
 
+  /**
+   * Validate cpf
+   * @param  {string} doc 
+   * @return {boolean}
+   */
   $.myValidate.prototype.validarCPF = function(doc) {
     var i, cpf = doc.replace(/\D/g, ''), pattern = /^(\d{1})\1{10}$/, sum, mod, digit;
 
@@ -93,6 +111,11 @@
     return true;
   };
 
+  /**
+   * Validate cnpj
+   * @param  {string} doc 
+   * @return {boolean}
+   */
   $.myValidate.prototype.validarCNPJ = function(doc) {
     var i, cnpj = doc.replace(/\D/g, ''), pattern = /^(\d{1})\1{13}$/, soma, multiplicador, digitoUm, digitoDois;
     if (cnpj.length !== 14) {
@@ -137,60 +160,85 @@
     return false;
   };
 
+  /**
+   * Construct funcation
+   * @return {void}
+   */
   $.myValidate.prototype.init = function() {
-    var self = this;
-
-    $(this.element).submit(function(event) {
-      self.$form = $(this);
-      if (!self.callbackSubmit) {
-        event.preventDefault();
-        self.noValidate = false;
-        self.getErrorMessage();
-        self.settings.beforeValidate(self.$form);
-        self.getRequireds(this);
-      }
-    });
-
+    this.elementsOnClick();
+    this.elSubmit(this.element);
   };
 
-  $.myValidate.prototype.getRequireds = function(el) {
-    var self = this, $requireds = $(el).find('[data-myrules^="'+this.settings.required+'"]');
-    $(el).find('*').removeClass('error');
-    $requireds.each(function(){
-      var $this = $(this);
-      self.notVal($this);
-      self.validateEmail($this);
-      self.validateCpf($this);
-      self.validateCnpj($this);
-      self.validateSelect($this);
-      self.validateCheckbox($this);
-      self.validateEqual($this);
+  /**
+   * Get all elements onClick="javascript:document.forms[0].submit" and
+   * alter onClick="javascript:$(element).myValidate().submit();"
+   * @return {void}
+   */
+  $.myValidate.prototype.elementsOnClick = function() {
+    var self = this, el = 'form' + ((self.element.id.length ? '#' + self.element.id :(self.element.name.length ? '[name="' + self.element.name + '"]':(self.element.className.length ? '.' + self.element.className : ''))));
+    $(el + ' [onclick*="submit()"]').each(function(key, val) {
+      $(val).attr('onclick', "javascript:$('" + el + "').myValidate().submit();");
     });
-    if (this.noValidate) {
-        this.settings.callError(this.$form);
+  };
+
+  /**
+   * Event submit
+   * @param  {string} el
+   * @return {void}
+   */
+  $.myValidate.prototype.elSubmit = function(el) {
+    var self = this;
+    $(el).on('submit', {self: self}, self.validate);
+  };
+
+  /**
+   * Check 
+   * @param  {[type]} event [description]
+   * @return {[type]}       [description]
+   */
+  $.myValidate.prototype.validate = function(event) {
+    var self = event ? event.data.self : this;
+    self.callbackSubmit = true;
+    if (self.$requireds.length >0) {
+      self.getErrorMessage(event);
+      self.options.beforeValidate(self.$form);
+      self.$requireds.each(function(){
+        var $this = $(this);
+        $this.removeClass('error');
+        self.notVal($this);
+        self.validateEmail($this);
+        self.validateCpf($this);
+        self.validateCnpj($this);
+        self.validateSelect($this);
+        self.validateCheckbox($this);
+        self.validateEqual($this);
+      });
+    }
+    if (self.callbackSubmit) {
+      self.options.callSuccess(event, self.$form, self.callbackSubmit);
     } else {
-        this.settings.callSuccess(this.$form);
+      self.options.callError(event, self.$form, self.callbackSubmit);
     }
   };
 
   $.myValidate.prototype.notification = function(message) {
-    $(this.settings.notification).html(message);
+    $(this.options.notification).html(message);
   };
 
   $.myValidate.prototype.getErrorMessage = function(event) {
     var self = event ? event.data.self : this;
-    self.settings.error = self.$form.data('error') || self.settings.error;
-    self.settings.errormail = self.$form.data('errormail') || self.settings.errormail;
-    self.settings.errorattach = self.$form.data('errorattach') || self.settings.errorattach;
-    self.settings.errorcpf = self.$form.data('errorcpf') || self.settings.errorcpf;
-    self.settings.errorcnpj = self.$form.data('errorcnpj') || self.settings.errorcnpj;
-    self.settings.erroequal = self.$form.data('erroequal') || self.settings.erroequal;
+    self.options.error = self.$form.data('error') || self.options.error;
+    self.options.errormail = self.$form.data('errormail') || self.options.errormail;
+    self.options.errorattach = self.$form.data('errorattach') || self.options.errorattach;
+    self.options.errorcpf = self.$form.data('errorcpf') || self.options.errorcpf;
+    self.options.errorcnpj = self.$form.data('errorcnpj') || self.options.errorcnpj;
+    self.options.erroequal = self.$form.data('erroequal') || self.options.erroequal;
   };
 
   $.myValidate.prototype.notVal = function(field) {
     if (field.val() === '') {
-        this.noValidate = true;
-        this.notification(this.settings.error);
+        this.callbackSubmit = false;
+        this.notification(this.options.error);
         field.addClass('error');
         this.notFile(field);
     }
@@ -198,12 +246,12 @@
 
   $.myValidate.prototype.notFile = function(field) {
     if (field.is('input[type="file"]')) {
-      this.notification(this.settings.errorattach);
-      this.noValidate = true;
+      this.notification(this.options.errorattach);
+      this.callbackSubmit = false;
       field.parent().addClass('error')
            .find('.label')
            .addClass('error');
-      this.notification(this.settings.errorattach);
+      this.notification(this.options.errorattach);
     }
   };
 
@@ -211,9 +259,9 @@
     if (field.filter('[data-myrules*="email"]').length) {
       var expressao_regular = /^[\d\w]+([_.-]?[\d\w]+)*@([\d\w_-]{2,}(\.){1})+?[\d\w]{2,4}$/;
       if (!expressao_regular.test(field.val())) {
-        this.noValidate = true;
+        this.callbackSubmit = false;
         field.addClass('error');
-        this.notification(this.settings.errormail);
+        this.notification(this.options.errormail);
       }
     }
   };
@@ -221,9 +269,9 @@
   $.myValidate.prototype.validateCpf = function(field) {
     if (field.filter('[data-myrules*="cpf"]').length) {
       if (!this.validarCPF(field.val())) {
-        this.noValidate = true;
+        this.callbackSubmit = false;
         field.addClass('error');
-        this.notification(this.settings.errorcpf);
+        this.notification(this.options.errorcpf);
       }
     }
   };
@@ -231,17 +279,17 @@
   $.myValidate.prototype.validateCnpj = function(field) {
     if (field.filter('[data-myrules*="cnpj"]').length) {
       if (!this.validarCNPJ(field.val())) {
-        this.noValidate = true;
+        this.callbackSubmit = false;
         field.addClass('error');
-        this.notification(this.settings.errorcnpj);
+        this.notification(this.options.errorcnpj);
       }
     }
   };
 
   $.myValidate.prototype.validateSelect = function(field) {
     if (field.is('select') && field.val() === ('' || 0)) {
-      this.noValidate = true;
-      this.notification(this.settings.error);
+      this.callbackSubmit = false;
+      this.notification(this.options.error);
       field.next('.chzn-container')
            .addClass('error');
     }
@@ -250,8 +298,8 @@
   $.myValidate.prototype.validateCheckbox = function(field) {
     if (field.is('input[type="checkbox"]') && !field.is('input:checked')) {
       field.parent().addClass('error');
-      this.noValidate = true;
-      this.notification(this.settings.errormail);
+      this.callbackSubmit = false;
+      this.notification(this.options.errormail);
     }
   };
 
@@ -262,8 +310,8 @@
         compare = compare.replace('equal[', '');
         compare = compare.replace(']', '');
         if ($('[name="'+compare+'"]').val() !== field.val()) {
-            this.noValidate = true;
-            this.notification(this.settings.erroequal);
+            this.callbackSubmit = false;
+            this.notification(this.options.erroequal);
             field.addClass('error');
             $('[name="'+compare+'"]').addClass('error');
         }
