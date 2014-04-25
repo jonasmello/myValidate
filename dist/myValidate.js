@@ -1,4 +1,4 @@
-/*! myValidate - v2.0.0 - 2014-03-26
+/*! myValidate - v2.1.0 - 2014-04-25
 * https://github.com/jonasmello/myValidate
 * Copyright (c) 2014 Jonas Mello; Licensed MIT */
 // o ponto-e-vírgula antes de invocar a função é uma prática segura contra scripts
@@ -37,13 +37,16 @@
 
   // Static method.
   $.myValidate = function(element, options) {
-    this.version = '2.0.0';
+    this.version = '2.1.0';
     this.element = element;
     this.callbackSubmit = true; // Utilizado para bloquear o submit do formulário
     this.options = $.extend({}, $.myValidate.options, options);
     this.$form = $(this.element);
-    this.$requireds = this.$form.find('[data-myrules^="'+this.options.required+'"]');
-
+    if (this.options.notdisabled) {
+      this.$rules = this.$form.find('[data-myrules]').not(':disabled');
+    } else {
+      this.$rules = this.$form.find('[data-myrules]');
+    }
     if (this.element) {
       this.init();
     }
@@ -61,6 +64,7 @@
       required: "required", // Parametro que define se o campo é obrigatório
       notification: ".notification", // class para notificação
       errorcolor: "#F00", // cor do erro
+      notdisabled: true, // Não retorna campos com disabled
       // Função executada antes da validação
       beforeValidate : function() {
       },
@@ -199,13 +203,14 @@
   $.myValidate.prototype.validate = function(event) {
     var self = event ? event.data.self : this;
     self.callbackSubmit = true;
-    if (self.$requireds.length >0) {
+    if (self.$rules.length >0) {
       self.getErrorMessage(event);
       self.options.beforeValidate(self.$form);
-      self.$requireds.each(function(){
+      self.$rules.each(function() {
         var $this = $(this);
         $this.removeClass('error');
-        self.notVal($this);
+        self.isRequired($this);
+        //self.notVal($this);
         self.validateEmail($this);
         self.validateCpf($this);
         self.validateCnpj($this);
@@ -233,6 +238,12 @@
     self.options.errorcpf = self.$form.data('errorcpf') || self.options.errorcpf;
     self.options.errorcnpj = self.$form.data('errorcnpj') || self.options.errorcnpj;
     self.options.erroequal = self.$form.data('erroequal') || self.options.erroequal;
+  };
+
+  $.myValidate.prototype.isRequired = function(field) {
+    if (field.filter('[data-myrules*="required"]').length) {
+        this.notVal(field);
+    }
   };
 
   $.myValidate.prototype.notVal = function(field) {
@@ -309,11 +320,12 @@
             compare = field.data('myrules').slice(n_pos);
         compare = compare.replace('equal[', '');
         compare = compare.replace(']', '');
-        if ($('[name="'+compare+'"]').val() !== field.val()) {
+        compare = this.$form.find('[name="'+compare+'"]');
+        if (compare.val() !== '' && compare.val() !== field.val()) {
             this.callbackSubmit = false;
             this.notification(this.options.erroequal);
             field.addClass('error');
-            $('[name="'+compare+'"]').addClass('error');
+            compare.addClass('error');
         }
     }
   };
