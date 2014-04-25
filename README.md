@@ -41,6 +41,11 @@ $(function () {
     <span class="label-txt">E-mail:</span>
     <input type="text" name="email" class="txt-field" data-myrules="required|email">
   </label>
+  <label>
+    <span class="label-txt">Password:</span>
+    <input type="password" name="password" class="txt-field" data-myrules="required">
+    <input type="password" name="password_confirmation" class="txt-field" data-myrules="required|equal[password]">
+  </label>
   <input type="submit" value="Send">
 </form>
 ```
@@ -48,6 +53,15 @@ $(function () {
 Online example: [myValidate][example]
 
 ## Release History
+
+* **v2.1.0** - 2013-11-02
+   - Checking information with ```[date myrules]```
+   - Add option ```notdisabled``` returns fields with 'disable'
+   - Add ```isRequired``` check fields with 'required'
+   - Fix bug ```validateEqual```
+
+* **v2.0.0** - 2013-11-02
+   - Changing structure for use grunt and facilitate implementation
 
 * **v1.0.1** - 2013-11-02
    - Fix bug ```validarCPF``` and add ```validarCNPJ```
