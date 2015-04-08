@@ -64,7 +64,7 @@
       errormail: "Please enter a valid email address.", // Mensagem de error para e-mail
       errorcpf: "CPF Inválido", // Mensagem de erro para CPF
       errorcnpj: "CNPJ Inválido", // Mensagem de error para CNPJ
-      erroequal: "Campos %s não são iguais", // Mensagem de error para campos iguais
+      erroequal: "Campos {0} e {1} não são iguais", // Mensagem de error para campos iguais
       required: "required", // Parametro que define se o campo é obrigatório
       notification: ".notification", // class para notificação
       errorcolor: "#F00", // cor do erro
@@ -86,7 +86,7 @@
 
   /**
    * Validate cpf
-   * @param  {string} doc 
+   * @param  {string} doc
    * @return {boolean}
    */
   $.myValidate.prototype.validarCPF = function(doc) {
@@ -121,7 +121,7 @@
 
   /**
    * Validate cnpj
-   * @param  {string} doc 
+   * @param  {string} doc
    * @return {boolean}
    */
   $.myValidate.prototype.validarCNPJ = function(doc) {
@@ -200,7 +200,7 @@
   };
 
   /**
-   * Check 
+   * Check
    * @param  {[type]} event [description]
    * @return {[type]}       [description]
    */
@@ -218,6 +218,7 @@
         self.validateEmail($this);
         self.validateCpf($this);
         self.validateCnpj($this);
+        self.validateDoc($this);
         self.validateSelect($this);
         self.validateCheckbox($this);
         self.validateEqual($this);
@@ -301,6 +302,25 @@
     }
   };
 
+  $.myValidate.prototype.validateDoc = function(field) {
+    if (field.filter('[data-myrules*="doc"]').length) {
+      var num = field.val().replace(/\D/g, ''), qty = num.length;
+      if (qty > 11) {
+        if (!this.validarCNPJ(field.val())) {
+            this.callbackSubmit = false;
+            field.addClass('error');
+            this.notification(this.options.errorcnpj);
+        }
+      } else {
+        if (!this.validarCPF(field.val())) {
+            this.callbackSubmit = false;
+            field.addClass('error');
+            this.notification(this.options.errorcpf);
+        }
+      }
+    }
+  };
+
   $.myValidate.prototype.validateSelect = function(field) {
     if (field.is('select') && field.val() === ('' || 0)) {
       this.callbackSubmit = false;
@@ -321,17 +341,29 @@
   $.myValidate.prototype.validateEqual = function(field) {
     if (field.filter('[data-myrules*="equal"]').length) {
         var n_pos = field.data('myrules').search("equal"),
-            compare = field.data('myrules').slice(n_pos);
+            compare = field.data('myrules').slice(n_pos),
+            field_title = field.attr('title') || field.attr('name'),
+            compare_title;
         compare = compare.replace('equal[', '');
         compare = compare.replace(']', '');
         compare = this.$form.find('[name="'+compare+'"]');
+        compare_title = compare.attr('title') || compare.attr('name');
         if (compare.val() !== '' && compare.val() !== field.val()) {
             this.callbackSubmit = false;
-            this.notification(this.options.erroequal);
+            this.notification(this.options.erroequal.format(field_title, compare_title));
             field.addClass('error');
             compare.addClass('error');
         }
     }
   };
+
+  if (!String.prototype.format) {
+    String.prototype.format = function() {
+      var args = arguments;
+      return this.replace(/{(\d+)}/g, function(match, number) {
+        return typeof args[number] !== 'undefined' ? args[number] : match;
+      });
+    };
+  }
 
 }(jQuery, window));

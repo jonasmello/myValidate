@@ -31,8 +31,8 @@ $(function () {
 });
 ```
 ```html
-<form class="myValidate">
-<div class="notification" style="display: none;"></div>
+<form action="" class="myValidate">
+  <div class="notification" style="display: none;"></div>
   <label>
     <span class="label-txt">Name:</span>
     <input type="text" name="name" class="txt-field" data-myrules="required">
@@ -41,6 +41,16 @@ $(function () {
     <span class="label-txt">E-mail:</span>
     <input type="text" name="email" class="txt-field" data-myrules="required|email">
   </label>
+  <label>
+    <span class="label-txt">Doc:</span>
+    <input type="text" name="doc" class="txt-field" data-myrules="doc">
+  </label>
+  <label>
+    <span class="label-txt">Password:</span>
+    <input type="password" name="password" title="Password" class="txt-field" data-myrules="required">
+    <span class="label-txt">Password Confirm:</span>
+    <input type="password" name="password_confirmation" title="Password Confirm" class="txt-field" data-myrules="required|equal[password]">
+  </label>
   <input type="submit" value="Send">
 </form>
 ```
@@ -48,6 +58,20 @@ $(function () {
 Online example: [myValidate][example]
 
 ## Release History
+
+* **v2.2.0** - 2015-04-08
+   - Add ```validateDoc```
+   - Add file .editorconfig
+   - Fix bug erroequal
+
+* **v2.1.0** - 2013-11-02
+   - Checking information with ```[date myrules]```
+   - Add option ```notdisabled``` returns fields with 'disable'
+   - Add ```isRequired``` check fields with 'required'
+   - Fix bug ```validateEqual```
+
+* **v2.0.0** - 2013-11-02
+   - Changing structure for use grunt and facilitate implementation
 
 * **v1.0.1** - 2013-11-02
    - Fix bug ```validarCPF``` and add ```validarCNPJ```
