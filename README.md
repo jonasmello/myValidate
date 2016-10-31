@@ -59,6 +59,9 @@ Online example: [myValidate][example]
 
 ## Release History
 
+* **v2.2.1** - 2016-10-31
+   - Fix bug select2
+
 * **v2.2.0** - 2015-04-08
    - Add ```validateDoc```
    - Add file .editorconfig

@@ -1,8 +1,10 @@
-/*! myValidate - v2.1.0 - 2015-04-08
+/*! myValidate - v2.2.1 - 2016-10-31
 * https://github.com/jonasmello/myValidate
-* Copyright (c) 2015 Jonas Mello; Licensed MIT */
+* Copyright (c) 2016 Jonas Mello; Licensed MIT */
 // o ponto-e-vírgula antes de invocar a função é uma prática segura contra scripts
 // concatenados e/ou outros plugins que não foram fechados corretamente.
+/* global console */
+/*jshint scripturl:true*/
 ;(function($, window, undefined) {
   'use strict';
   // 'undefined' é usado aqui como a variável global 'undefined', no ECMAScript 3 é
@@ -37,7 +39,7 @@
 
   // Static method.
   $.myValidate = function(element, options) {
-    this.version = '2.1.0';
+    this.version = '2.2.0';
     this.element = element;
     this.callbackSubmit = true; // Utilizado para bloquear o submit do formulário
     this.options = $.extend({}, $.myValidate.options, options);
@@ -69,14 +71,14 @@
       beforeValidate : function() {
       },
       // Função executada quando ha erro
-      callError : function(event, el, status){
-        //console.log(el, status);
+      callError : function(event, el, status) {
+        if (this.options.debug) { console.log(event, el, status); }
         event.preventDefault();
         el.find('.notification').slideDown();
       },
       // Função executada quando não ha erro
-      callSuccess : function(event, el, status){
-        //console.log(el, status);
+      callSuccess : function(event, el, status) {
+        if (this.options.debug) { console.log(event, el, status); }
       }
   };
 
@@ -318,10 +320,16 @@
   };
 
   $.myValidate.prototype.validateSelect = function(field) {
-    if (field.is('select') && field.val() === ('' || 0)) {
+    if (field.is('select') && field.val() === '') {
       this.callbackSubmit = false;
       this.notification(this.options.error);
+      // select
+      field.addClass('error');
+      //chozen
       field.next('.chzn-container')
+           .addClass('error');
+      // select2
+      field.next('.select2-container')
            .addClass('error');
     }
   };
