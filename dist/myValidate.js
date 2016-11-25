@@ -1,4 +1,4 @@
-/*! myValidate - v2.2.1 - 2016-10-31
+/*! myValidate - v2.2.2 - 2016-11-25
 * https://github.com/jonasmello/myValidate
 * Copyright (c) 2016 Jonas Mello; Licensed MIT */
 // o ponto-e-vírgula antes de invocar a função é uma prática segura contra scripts
@@ -39,7 +39,7 @@
 
   // Static method.
   $.myValidate = function(element, options) {
-    this.version = '2.2.0';
+    this.version = '2.2.2';
     this.element = element;
     this.callbackSubmit = true; // Utilizado para bloquear o submit do formulário
     this.options = $.extend({}, $.myValidate.options, options);
@@ -72,13 +72,13 @@
       },
       // Função executada quando ha erro
       callError : function(event, el, status) {
-        if (this.options.debug) { console.log(event, el, status); }
+        if (this.debug) { console.log(event, el, status); }
         event.preventDefault();
         el.find('.notification').slideDown();
       },
       // Função executada quando não ha erro
       callSuccess : function(event, el, status) {
-        if (this.options.debug) { console.log(event, el, status); }
+        if (this.debug) { console.log(event, el, status); }
       }
   };
 

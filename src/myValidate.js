@@ -43,7 +43,7 @@
 
   // Static method.
   $.myValidate = function(element, options) {
-    this.version = '2.2.0';
+    this.version = '2.2.2';
     this.element = element;
     this.callbackSubmit = true; // Utilizado para bloquear o submit do formulário
     this.options = $.extend({}, $.myValidate.options, options);
@@ -76,13 +76,13 @@
       },
       // Função executada quando ha erro
       callError : function(event, el, status) {
-        if (this.options.debug) { console.log(event, el, status); }
+        if (this.debug) { console.log(event, el, status); }
         event.preventDefault();
         el.find('.notification').slideDown();
       },
       // Função executada quando não ha erro
       callSuccess : function(event, el, status) {
-        if (this.options.debug) { console.log(event, el, status); }
+        if (this.debug) { console.log(event, el, status); }
       }
   };
 
