@@ -23,36 +23,47 @@
 
   // Collection method.
   $.fn.myValidate = function(options) {
-    var myValidate, instance = (typeof options === "object" && options.instance) || false;
+    var myValidate,
+      instance = (typeof options === "object" && options.instance) || false,
+      removeData = (typeof options === "object" && options.removeData) || false;
     if (instance) {
-        this.each(function() {
-            myValidate = new $.myValidate(this, options);
-            if ( !$.data( this, 'myValidate' ) ) {
-              $.data(this, 'myValidate', myValidate);
-            }
-        });
+      this.each(function() {
+        myValidate = new $.myValidate(this, options);
+        if (removeData) {
+          $.removeData(this, 'myValidate');
+        }
+        if (!$.data(this, 'myValidate')) {
+          $.data(this, 'myValidate', myValidate);
+        }
+      });
     } else {
-        myValidate = this.each(function() {
-            if ( !$.data( this, 'myValidate' ) ) {
-              $.data(this, 'myValidate', new $.myValidate(this, options));
-            }
-        });
+      myValidate = this.each(function() {
+        if (removeData) {
+          $.removeData(this, 'myValidate');
+        }
+        if (!$.data(this, 'myValidate')) {
+          $.data(this, 'myValidate', new $.myValidate(this, options));
+        }
+      });
     }
     return myValidate;
   };
 
   // Static method.
   $.myValidate = function(element, options) {
-    this.version = '2.2.2';
+    this.version = '2.3';
     this.element = element;
     this.callbackSubmit = true; // Utilizado para bloquear o submit do formulário
     this.options = $.extend({}, $.myValidate.options, options);
     this.$form = $(this.element);
-    if (this.options.notdisabled) {
-      this.$rules = this.$form.find('[data-myrules]').not(':disabled');
-    } else {
-      this.$rules = this.$form.find('[data-myrules]');
-    }
+    this.reset = $.proxy(function() {
+      if (this.options.notdisabled) {
+        this.$rules = this.$form.find('[data-myrules]').not(':disabled');
+      } else {
+        this.$rules = this.$form.find('[data-myrules]');
+      }
+    }, this);
+    this.reset();
     if (this.element) {
       this.init();
     }
@@ -60,30 +71,32 @@
 
   // Static method default options.
   $.myValidate.options = {
-      debug: false, // Ativa/desativa o debug do plugin
-      error: "Some required fields are empty.", // Mensagem de erro para campo vazio
-      errorattach: "It is necessary to attach a file.", // Mensagem de error para arquivo
-      errormail: "Please enter a valid email address.", // Mensagem de error para e-mail
-      errorcpf: "CPF Inválido", // Mensagem de erro para CPF
-      errorcnpj: "CNPJ Inválido", // Mensagem de error para CNPJ
-      erroequal: "Campos {0} e {1} não são iguais", // Mensagem de error para campos iguais
-      required: "required", // Parametro que define se o campo é obrigatório
-      notification: ".notification", // class para notificação
-      errorcolor: "#F00", // cor do erro
-      notdisabled: true, // Não retorna campos com disabled
-      // Função executada antes da validação
-      beforeValidate : function() {
-      },
-      // Função executada quando ha erro
-      callError : function(event, el, status) {
-        if (this.debug) { console.log(event, el, status); }
-        event.preventDefault();
-        el.find('.notification').slideDown();
-      },
-      // Função executada quando não ha erro
-      callSuccess : function(event, el, status) {
-        if (this.debug) { console.log(event, el, status); }
+    debug: false, // Ativa/desativa o debug do plugin
+    error: "Some required fields are empty.", // Mensagem de erro para campo vazio
+    errorattach: "It is necessary to attach a file.", // Mensagem de error para arquivo
+    errormail: "Please enter a valid email address.", // Mensagem de error para e-mail
+    errorcpf: "CPF Inválido", // Mensagem de erro para CPF
+    errorcnpj: "CNPJ Inválido", // Mensagem de error para CNPJ
+    erroequal: "Campos {0} e {1} não são iguais", // Mensagem de error para campos iguais
+    required: "required", // Parametro que define se o campo é obrigatório
+    notification: ".notification", // class para notificação
+    errorcolor: "#F00", // cor do erro
+    notdisabled: true, // Não retorna campos com disabled
+    // Função executada antes da validação
+    beforeValidate: function() {},
+    // Função executada quando ha erro
+    callError: function(event, el, status) {
+      if (this.debug) {
+        console.log(event, el, status);
       }
+      el.find('.notification').slideDown();
+    },
+    // Função executada quando não ha erro
+    callSuccess: function(event, el, status) {
+      if (this.debug) {
+        console.log(event, el, status);
+      }
+    }
   };
 
   /**
@@ -92,31 +105,33 @@
    * @return {boolean}
    */
   $.myValidate.prototype.validarCPF = function(doc) {
-    var i, cpf = doc.replace(/\D/g, ''), pattern = /^(\d{1})\1{10}$/, sum, mod, digit;
+    var i, cpf = doc.replace(/\D/g, ''),
+      pattern = /^(\d{1})\1{10}$/,
+      sum, mod, digit;
 
     if (cpf.length !== 11) {
-        return false;
+      return false;
     }
     if (pattern.test(cpf)) {
-        return false;
+      return false;
     }
     sum = 0;
     for (i = 0; i < 9; i += 1) {
-        sum += parseInt(cpf.charAt(i), 10) * (10 - i);
+      sum += parseInt(cpf.charAt(i), 10) * (10 - i);
     }
     mod = sum % 11;
     digit = (mod > 1) ? (11 - mod) : 0;
     if (parseInt(cpf.charAt(9), 10) !== digit) {
-        return false;
+      return false;
     }
     sum = 0;
     for (i = 0; i < 10; i += 1) {
-        sum += parseInt(cpf.charAt(i), 10) * (11 - i);
+      sum += parseInt(cpf.charAt(i), 10) * (11 - i);
     }
     mod = sum % 11;
     digit = (mod > 1) ? (11 - mod) : 0;
     if (parseInt(cpf.charAt(10), 10) !== digit) {
-        return false;
+      return false;
     }
     return true;
   };
@@ -127,45 +142,47 @@
    * @return {boolean}
    */
   $.myValidate.prototype.validarCNPJ = function(doc) {
-    var i, cnpj = doc.replace(/\D/g, ''), pattern = /^(\d{1})\1{13}$/, soma, multiplicador, digitoUm, digitoDois;
+    var i, cnpj = doc.replace(/\D/g, ''),
+      pattern = /^(\d{1})\1{13}$/,
+      soma, multiplicador, digitoUm, digitoDois;
     if (cnpj.length !== 14) {
-        return false;
+      return false;
     }
     if (pattern.test(cnpj)) {
-        return false;
+      return false;
     }
     soma = 0;
     for (i = 0; i < 12; i += 1) {
-        /** verifica qual é o multiplicador. Caso o valor do caracter seja entre 0-3, diminui o valor do caracter por 5
-        * caso for entre 4-11, diminui por 13 **/
-        multiplicador = (i <= 3 ? 5 : 13) - i;
+      /** verifica qual é o multiplicador. Caso o valor do caracter seja entre 0-3, diminui o valor do caracter por 5
+       * caso for entre 4-11, diminui por 13 **/
+      multiplicador = (i <= 3 ? 5 : 13) - i;
 
-        soma += parseInt(cnpj.charAt(i), 10) * multiplicador;
+      soma += parseInt(cnpj.charAt(i), 10) * multiplicador;
     }
     soma = soma % 11;
-    if (soma === 0  || soma === 1) {
-        digitoUm = 0;
+    if (soma === 0 || soma === 1) {
+      digitoUm = 0;
     } else {
-        digitoUm = 11 - soma;
+      digitoUm = 11 - soma;
     }
     if (parseInt(digitoUm, 10) === parseInt(cnpj.charAt(12), 10)) {
-        soma = 0;
+      soma = 0;
 
-        for (i = 0; i < 13; i += 1) {
-            /** verifica qual é o multiplicador. Caso o valor do caracter seja entre 0-4, diminui o valor do caracter por 6
-             * caso for entre 4-12, diminui por 14 **/
-            multiplicador = (i <= 4 ? 6 : 14) - i;
-            soma += parseInt(cnpj.charAt(i), 10) * multiplicador;
-        }
-        soma = soma % 11;
-        if (soma === 0 || soma === 1) {
-            digitoDois = 0;
-        } else {
-            digitoDois = 11 - soma;
-        }
-        if (digitoDois === parseInt(cnpj.charAt(13), 10)) {
-            return true;
-        }
+      for (i = 0; i < 13; i += 1) {
+        /** verifica qual é o multiplicador. Caso o valor do caracter seja entre 0-4, diminui o valor do caracter por 6
+         * caso for entre 4-12, diminui por 14 **/
+        multiplicador = (i <= 4 ? 6 : 14) - i;
+        soma += parseInt(cnpj.charAt(i), 10) * multiplicador;
+      }
+      soma = soma % 11;
+      if (soma === 0 || soma === 1) {
+        digitoDois = 0;
+      } else {
+        digitoDois = 11 - soma;
+      }
+      if (digitoDois === parseInt(cnpj.charAt(13), 10)) {
+        return true;
+      }
     }
     return false;
   };
@@ -185,7 +202,8 @@
    * @return {void}
    */
   $.myValidate.prototype.elementsOnClick = function() {
-    var self = this, el = 'form' + ((self.element.id.length ? '#' + self.element.id :(self.element.name.length ? '[name="' + self.element.name + '"]':(self.element.className.length ? '.' + self.element.className : ''))));
+    var self = this,
+      el = 'form' + ((self.element.id.length ? '#' + self.element.id : (self.element.name.length ? '[name="' + self.element.name + '"]' : (self.element.className.length ? '.' + self.element.className : ''))));
     $(el + ' [onclick*="submit()"]').each(function(key, val) {
       $(val).attr('onclick', "javascript:$('" + el + "').myValidate().submit();");
     });
@@ -198,7 +216,9 @@
    */
   $.myValidate.prototype.elSubmit = function(el) {
     var self = this;
-    $(el).on('submit', {self: self}, self.validate);
+    $(el).on('submit', {
+      self: self
+    }, self.validate);
   };
 
   /**
@@ -209,26 +229,38 @@
   $.myValidate.prototype.validate = function(event) {
     var self = event ? event.data.self : this;
     self.callbackSubmit = true;
-    if (self.$rules.length >0) {
+    if (self.$rules.length > 0) {
       self.getErrorMessage(event);
       self.options.beforeValidate(self.$form);
       self.$rules.each(function() {
         var $this = $(this);
-        $this.removeClass('error');
-        self.isRequired($this);
-        //self.notVal($this);
-        self.validateEmail($this);
-        self.validateCpf($this);
-        self.validateCnpj($this);
-        self.validateDoc($this);
-        self.validateSelect($this);
-        self.validateCheckbox($this);
-        self.validateEqual($this);
+        if ($this.not(':disabled') || !$this.attr('disabled')) {
+          $this.removeClass('error');
+          $this.parent().removeClass('error');
+          //chozen
+          $this.next('.chzn-container')
+            .removeClass('error');
+          // select2
+          $this.next('.select2-container')
+            .find('.select2-selection')
+            .removeClass('error');
+          self.isRequired($this);
+          //self.notVal($this);
+          self.validateEmail($this);
+          self.validateCpf($this);
+          self.validateCnpj($this);
+          self.validateDoc($this);
+          self.validateSelect($this);
+          self.validateCheckbox($this);
+          self.validateEqual($this);
+        }
       });
     }
     if (self.callbackSubmit) {
       self.options.callSuccess(event, self.$form, self.callbackSubmit);
     } else {
+      event.preventDefault();
+      event.stopPropagation();
       self.options.callError(event, self.$form, self.callbackSubmit);
     }
   };
@@ -249,16 +281,16 @@
 
   $.myValidate.prototype.isRequired = function(field) {
     if (field.filter('[data-myrules*="required"]').length) {
-        this.notVal(field);
+      this.notVal(field);
     }
   };
 
   $.myValidate.prototype.notVal = function(field) {
     if (field.val() === '' || field.val() === null) {
-        this.callbackSubmit = false;
-        this.notification(this.options.error);
-        field.addClass('error');
-        this.notFile(field);
+      this.callbackSubmit = false;
+      this.notification(this.options.error);
+      field.addClass('error');
+      this.notFile(field);
     }
   };
 
@@ -267,8 +299,8 @@
       this.notification(this.options.errorattach);
       this.callbackSubmit = false;
       field.parent().addClass('error')
-           .find('.label')
-           .addClass('error');
+        .find('.label')
+        .addClass('error');
       this.notification(this.options.errorattach);
     }
   };
@@ -306,18 +338,19 @@
 
   $.myValidate.prototype.validateDoc = function(field) {
     if (field.filter('[data-myrules*="doc"]').length) {
-      var num = field.val().replace(/\D/g, ''), qty = num.length;
+      var num = field.val().replace(/\D/g, ''),
+        qty = num.length;
       if (qty > 11) {
         if (!this.validarCNPJ(field.val())) {
-            this.callbackSubmit = false;
-            field.addClass('error');
-            this.notification(this.options.errorcnpj);
+          this.callbackSubmit = false;
+          field.addClass('error');
+          this.notification(this.options.errorcnpj);
         }
       } else {
         if (!this.validarCPF(field.val())) {
-            this.callbackSubmit = false;
-            field.addClass('error');
-            this.notification(this.options.errorcpf);
+          this.callbackSubmit = false;
+          field.addClass('error');
+          this.notification(this.options.errorcpf);
         }
       }
     }
@@ -331,10 +364,11 @@
       field.addClass('error');
       //chozen
       field.next('.chzn-container')
-           .addClass('error');
+        .addClass('error');
       // select2
       field.next('.select2-container')
-           .addClass('error');
+        .find('.select2-selection')
+        .addClass('error');
     }
   };
 
@@ -348,20 +382,20 @@
 
   $.myValidate.prototype.validateEqual = function(field) {
     if (field.filter('[data-myrules*="equal"]').length) {
-        var n_pos = field.data('myrules').search("equal"),
-            compare = field.data('myrules').slice(n_pos),
-            field_title = field.attr('title') || field.attr('name'),
-            compare_title;
-        compare = compare.replace('equal[', '');
-        compare = compare.replace(']', '');
-        compare = this.$form.find('[name="'+compare+'"]');
-        compare_title = compare.attr('title') || compare.attr('name');
-        if (compare.val() !== '' && compare.val() !== field.val()) {
-            this.callbackSubmit = false;
-            this.notification(this.options.erroequal.format(field_title, compare_title));
-            field.addClass('error');
-            compare.addClass('error');
-        }
+      var n_pos = field.data('myrules').search("equal"),
+        compare = field.data('myrules').slice(n_pos),
+        field_title = field.attr('title') || field.attr('name'),
+        compare_title;
+      compare = compare.replace('equal[', '');
+      compare = compare.replace(']', '');
+      compare = this.$form.find('[name="' + compare + '"]');
+      compare_title = compare.attr('title') || compare.attr('name');
+      if (compare.val() !== '' && compare.val() !== field.val()) {
+        this.callbackSubmit = false;
+        this.notification(this.options.erroequal.format(field_title, compare_title));
+        field.addClass('error');
+        compare.addClass('error');
+      }
     }
   };
 
