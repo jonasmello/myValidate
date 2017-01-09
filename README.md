@@ -59,13 +59,30 @@ Online example: [myValidate][example]
 
 ## Release History
 
+* **v2.3.0** - 2017-01-09
+   - Add removeData
+   - Add reset $rules
+   - Fix bug disabled fields
+
+* **v2.2.4** - 2016-12-29
+   - Fix bug select2 remove class error
+
+* **v2.2.3** - 2016-12-29
+   - Fix bug ```validateSelect```
+
+* **v2.2.2** - 2016-11-25
+   - Fix bug ```this.options.debug```
+
+* **v2.2.1** - 2016-10-31
+   - Fix bug select2
+
 * **v2.2.0** - 2015-04-08
    - Add ```validateDoc```
    - Add file .editorconfig
    - Fix bug erroequal
 
 * **v2.1.0** - 2013-11-02
-   - Checking information with ```[date myrules]```
+   - Checking information with ```[data-myrules]```
    - Add option ```notdisabled``` returns fields with 'disable'
    - Add ```isRequired``` check fields with 'required'
    - Fix bug ```validateEqual```
