@@ -1,6 +1,6 @@
-/*! myValidate - v2.2.2 - 2016-11-25
+/*! myValidate - v2.2.3 - 2017-01-09
 * https://github.com/jonasmello/myValidate
-* Copyright (c) 2016 Jonas Mello; Licensed MIT */
+* Copyright (c) 2017 Jonas Mello; Licensed MIT */
 // o ponto-e-vírgula antes de invocar a função é uma prática segura contra scripts
 // concatenados e/ou outros plugins que não foram fechados corretamente.
 /* global console */
@@ -250,7 +250,7 @@
   };
 
   $.myValidate.prototype.notVal = function(field) {
-    if (field.val() === '') {
+    if (field.val() === '' || field.val() === null) {
         this.callbackSubmit = false;
         this.notification(this.options.error);
         field.addClass('error');
@@ -320,7 +320,7 @@
   };
 
   $.myValidate.prototype.validateSelect = function(field) {
-    if (field.is('select') && field.val() === '') {
+    if (field.is('select') && (field.val() === '' || field.val() === null)) {
       this.callbackSubmit = false;
       this.notification(this.options.error);
       // select

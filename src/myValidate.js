@@ -254,7 +254,7 @@
   };
 
   $.myValidate.prototype.notVal = function(field) {
-    if (field.val() === '') {
+    if (field.val() === '' || field.val() === null) {
         this.callbackSubmit = false;
         this.notification(this.options.error);
         field.addClass('error');
@@ -324,7 +324,7 @@
   };
 
   $.myValidate.prototype.validateSelect = function(field) {
-    if (field.is('select') && field.val() === '') {
+    if (field.is('select') && (field.val() === '' || field.val() === null)) {
       this.callbackSubmit = false;
       this.notification(this.options.error);
       // select

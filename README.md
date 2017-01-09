@@ -59,6 +59,9 @@ Online example: [myValidate][example]
 
 ## Release History
 
+* **v2.2.3** - 2016-12-29
+   - Fix bug ```validateSelect```
+
 * **v2.2.2** - 2016-11-25
    - Fix bug ```this.options.debug```
 
