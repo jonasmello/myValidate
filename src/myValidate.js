@@ -82,6 +82,34 @@
     notification: ".notification", // class para notificação
     errorcolor: "#F00", // cor do erro
     notdisabled: true, // Não retorna campos com disabled
+    bind: 'keyup change',
+    changeBackground: true,
+    backgrounds: [
+        ['#cc0000', '#FFF'],
+        ['#cc3333', '#FFF'],
+        ['#cc6666', '#FFF'],
+        ['#ff9999', '#FFF'],
+        ['#e0941c', '#FFF'],
+        ['#e8a53a', '#FFF'],
+        ['#eab259', '#FFF'],
+        ['#efd09e', '#FFF'],
+        ['#ccffcc', '#FFF'],
+        ['#66cc66', '#FFF'],
+        ['#339933', '#FFF'],
+        ['#006600', '#FFF'],
+        ['#105610', '#FFF']
+    ],
+    passwordValidFrom: 60, // 60%
+    onValidatePassword: function(percentage) {
+      if (this.debug) {
+        console.log(percentage);
+      }
+    },
+    onPasswordStrengthChanged: function(passwordStrength, percentage) {
+      if (this.debug) {
+        console.log(passwordStrength, percentage);
+      }
+    },
     // Função executada antes da validação
     beforeValidate: function() {},
     // Função executada quando ha erro
@@ -96,7 +124,7 @@
       if (this.debug) {
         console.log(event, el, status);
       }
-    }
+    },
   };
 
   /**
@@ -223,8 +251,8 @@
 
   /**
    * Check
-   * @param  {[type]} event [description]
-   * @return {[type]}       [description]
+   * @param  {object} event
+   * @return {void}
    */
   $.myValidate.prototype.validate = function(event) {
     var self = event ? event.data.self : this;
@@ -235,6 +263,7 @@
       self.$rules.each(function() {
         var $this = $(this);
         if ($this.not(':disabled') || !$this.attr('disabled')) {
+          if ($this.data('myrules') === '')  { $this.data('myrules', 'required'); }
           $this.removeClass('error');
           $this.parent().removeClass('error');
           //chozen
@@ -244,15 +273,15 @@
           $this.next('.select2-container')
             .find('.select2-selection')
             .removeClass('error');
-          self.isRequired($this);
-          //self.notVal($this);
-          self.validateEmail($this);
-          self.validateCpf($this);
-          self.validateCnpj($this);
-          self.validateDoc($this);
-          self.validateSelect($this);
-          self.validateCheckbox($this);
-          self.validateEqual($this);
+          self.isRequired($this)
+              .validateEmail($this)
+              .validateCpf($this)
+              .validateCnpj($this)
+              .validateDoc($this)
+              .validateSelect($this)
+              .validateCheckbox($this)
+              .validateEqual($this)
+              .validatePassword($this);
         }
       });
     }
@@ -265,10 +294,20 @@
     }
   };
 
+  /**
+   * Add message el notification
+   * @param  {string} message
+   * @return {void}
+   */
   $.myValidate.prototype.notification = function(message) {
     $(this.options.notification).html(message);
   };
 
+  /**
+   * Get error message
+   * @param  {object} event
+   * @return {void}
+   */
   $.myValidate.prototype.getErrorMessage = function(event) {
     var self = event ? event.data.self : this;
     self.options.error = self.$form.data('error') || self.options.error;
@@ -279,12 +318,23 @@
     self.options.erroequal = self.$form.data('erroequal') || self.options.erroequal;
   };
 
+  /**
+   * Validate is required
+   * @param  {object}  field
+   * @return {myValidate}
+   */
   $.myValidate.prototype.isRequired = function(field) {
     if (field.filter('[data-myrules*="required"]').length) {
       this.notVal(field);
     }
+    return this;
   };
 
+  /**
+   * Validate not val
+   * @param  {object} field
+   * @return {myValidate}
+   */
   $.myValidate.prototype.notVal = function(field) {
     if (field.val() === '' || field.val() === null) {
       this.callbackSubmit = false;
@@ -292,8 +342,14 @@
       field.addClass('error');
       this.notFile(field);
     }
+    return this;
   };
 
+  /**
+   * Validate not file
+   * @param  {object} field
+   * @return {myValidate}
+   */
   $.myValidate.prototype.notFile = function(field) {
     if (field.is('input[type="file"]')) {
       this.notification(this.options.errorattach);
@@ -303,8 +359,14 @@
         .addClass('error');
       this.notification(this.options.errorattach);
     }
+    return this;
   };
 
+  /**
+   * Validate email
+   * @param  {object} field
+   * @return {myValidate}
+   */
   $.myValidate.prototype.validateEmail = function(field) {
     if (field.filter('[data-myrules*="email"]').length) {
       var expressao_regular = /^[\d\w]+([_.-]?[\d\w]+)*@([\d\w_-]{2,}(\.){1})+?[\d\w]{2,4}$/;
@@ -314,8 +376,14 @@
         this.notification(this.options.errormail);
       }
     }
+    return this;
   };
 
+  /**
+   * Validate cpf
+   * @param  {object} field
+   * @return {myValidate}
+   */
   $.myValidate.prototype.validateCpf = function(field) {
     if (field.filter('[data-myrules*="cpf"]').length) {
       if (!this.validarCPF(field.val())) {
@@ -324,8 +392,14 @@
         this.notification(this.options.errorcpf);
       }
     }
+    return this;
   };
 
+  /**
+   * Validate cnpj
+   * @param  {object} field
+   * @return {myValidate}
+   */
   $.myValidate.prototype.validateCnpj = function(field) {
     if (field.filter('[data-myrules*="cnpj"]').length) {
       if (!this.validarCNPJ(field.val())) {
@@ -334,8 +408,14 @@
         this.notification(this.options.errorcnpj);
       }
     }
+    return this;
   };
 
+  /**
+   * Validate doc
+   * @param  {object} field
+   * @return {myValidate}
+   */
   $.myValidate.prototype.validateDoc = function(field) {
     if (field.filter('[data-myrules*="doc"]').length) {
       var num = field.val().replace(/\D/g, ''),
@@ -354,8 +434,14 @@
         }
       }
     }
+    return this;
   };
 
+  /**
+   * Validate select
+   * @param  {object} field
+   * @return {myValidate}
+   */
   $.myValidate.prototype.validateSelect = function(field) {
     if (field.is('select') && (field.val() === '' || field.val() === null)) {
       this.callbackSubmit = false;
@@ -370,16 +456,28 @@
         .find('.select2-selection')
         .addClass('error');
     }
+    return this;
   };
 
+  /**
+   * Validate checkbox
+   * @param  {object} field
+   * @return {myValidate}
+   */
   $.myValidate.prototype.validateCheckbox = function(field) {
     if (field.is('input[type="checkbox"]') && !field.is('input:checked')) {
       field.parent().addClass('error');
       this.callbackSubmit = false;
       this.notification(this.options.errormail);
     }
+    return this;
   };
 
+  /**
+   * Validate equal
+   * @param  {object} field
+   * @return {myValidate}
+   */
   $.myValidate.prototype.validateEqual = function(field) {
     if (field.filter('[data-myrules*="equal"]').length) {
       var n_pos = field.data('myrules').search("equal"),
@@ -397,6 +495,144 @@
         compare.addClass('error');
       }
     }
+    return this;
+  };
+
+  /**
+   * Validate password
+   * @param  {object} field
+   * @return {myValidate}
+   */
+  $.myValidate.prototype.validatePassword = function(field) {
+    var self = this,
+        numbers_array = [],
+        upper_letters_array = [],
+        lower_letters_array = [],
+        special_chars_array = [],
+        pStrengthElementsDefaultStyle = [];
+
+    if (field.filter('[data-myrules*="password"]').length) {
+      self.callbackSubmit = false;
+
+      for(var i = 48; i < 58; i++) {
+        numbers_array.push(i);
+      }
+      for(i = 65; i < 91; i++) {
+        upper_letters_array.push(i);
+      }
+      for(i = 97; i < 123; i++) {
+        lower_letters_array.push(i);
+      }
+      for(i = 32; i < 48; i++) {
+        special_chars_array.push(i);
+      }
+      for(i = 58; i < 65; i++) {
+        special_chars_array.push(i);
+      }
+      for(i = 91; i < 97; i++) {
+        special_chars_array.push(i);
+      }
+      for(i = 123; i < 127; i++) {
+        special_chars_array.push(i);
+      }
+
+      var ord = function(string) {
+        var str = string + '',
+            code = str.charCodeAt(0);
+        if (0xD800 <= code && code <= 0xDBFF) {
+          var hi = code;
+          if (str.length === 1) {
+            return code;
+          }
+          var low = str.charCodeAt(1);
+          return ((hi - 0xD800) * 0x400) + (low - 0xDC00) + 0x10000;
+        }
+
+        if (0xDC00 <= code && code <= 0xDFFF) {
+          return code;
+        }
+        return code;
+      };
+
+      var behaviour = function(passwordStrength) {
+        var strengthPercentage = Math.ceil(passwordStrength * 100 / 12);
+            strengthPercentage = strengthPercentage > 100 ? 100 : strengthPercentage;
+
+        self.options.onPasswordStrengthChanged.call($(this), passwordStrength, strengthPercentage);
+        self.notification("Senha fraca");
+        if (strengthPercentage >= self.options.passwordValidFrom) {
+          self.notification("Senha segura");
+          self.callbackSubmit = true;
+          self.options.onValidatePassword.call($(this), strengthPercentage);
+        }
+
+        if (self.options.changeBackground) {
+          if (passwordStrength === undefined) {
+            passwordStrength = $(this);
+          }
+          passwordStrength = passwordStrength > 12 ? 12 : passwordStrength;
+
+          $($(this)).css({
+              'background-color': self.options.backgrounds[passwordStrength][0],
+              'color': self.options.backgrounds[passwordStrength][1]
+          });
+        }
+      };
+
+      var calculatePasswordStrength = function() {
+        var passwordStrength    = 0,
+            numbers_found       = 0,
+            upper_letters_found = 0,
+            lower_letters_found = 0,
+            special_chars_found = 0,
+            text = $(this).val().trim();
+
+        passwordStrength += 2 * Math.floor(text.length / 8);
+
+        for(var i = 0; i < text.length; i++) {
+            if($.inArray(ord(text.charAt(i)), numbers_array) !== -1 && numbers_found < 2) {
+                passwordStrength++;
+                numbers_found++;
+                continue;
+            }
+            if($.inArray(ord(text.charAt(i)), upper_letters_array) !== -1 && upper_letters_found < 2) {
+                passwordStrength++;
+                upper_letters_found++;
+                continue;
+            }
+            if($.inArray(ord(text.charAt(i)), lower_letters_array) !== -1 && lower_letters_found < 2) {
+                passwordStrength++;
+                lower_letters_found++;
+                continue;
+            }
+            if($.inArray(ord(text.charAt(i)), special_chars_array) !== -1 && special_chars_found < 2) {
+                passwordStrength++;
+                special_chars_found++;
+                continue;
+            }
+        }
+
+        behaviour.call($(this), passwordStrength);
+
+        return passwordStrength;
+      };
+
+      return field.each($.proxy(function (idx, pStrengthElement) {
+
+          pStrengthElementsDefaultStyle[$(pStrengthElement)] = {
+              'background': $(pStrengthElement).css('background'),
+              'color': $(pStrengthElement).css('color')
+          };
+
+          calculatePasswordStrength.call(pStrengthElement);
+
+          $(pStrengthElement).bind(self.options.bind, function() {
+              calculatePasswordStrength.call(pStrengthElement);
+          });
+
+      }, field));
+    }
+    return this;
   };
 
   if (!String.prototype.format) {

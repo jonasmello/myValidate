@@ -59,6 +59,10 @@ Online example: [myValidate][example]
 
 ## Release History
 
+* **v2.4.0** - 2017-01-20
+   - Add ```validatePassword```
+   - Fix bug data-myrules empty
+
 * **v2.3.0** - 2017-01-09
    - Add removeData
    - Add reset $rules
