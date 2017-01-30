@@ -1,4 +1,4 @@
-/*! myValidate - v2.4 - 2017-01-20
+/*! myValidate - v2.4.1 - 2017-01-30
 * https://github.com/jonasmello/myValidate
 * Copyright (c) 2017 Jonas Mello; Licensed MIT */
 // o ponto-e-vírgula antes de invocar a função é uma prática segura contra scripts
@@ -231,6 +231,9 @@
     $(el + ' [onclick*="submit()"]').each(function(key, val) {
       $(val).attr('onclick', "javascript:$('" + el + "').myValidate().submit();");
     });
+    $(el + ' [data-submit]').each(function(key, val) {
+      $(val).attr('onclick', "javascript:$('" + el + "').myValidate().submit();");
+    });
   };
 
   /**
@@ -276,8 +279,8 @@
               .validateDoc($this)
               .validateSelect($this)
               .validateCheckbox($this)
-              .validateEqual($this)
-              .validatePassword($this);
+              .validatePassword($this)
+              .validateEqual($this);
         }
       });
     }
@@ -613,7 +616,7 @@
         return passwordStrength;
       };
 
-      return field.each($.proxy(function (idx, pStrengthElement) {
+      field.each($.proxy(function (idx, pStrengthElement) {
 
           pStrengthElementsDefaultStyle[$(pStrengthElement)] = {
               'background': $(pStrengthElement).css('background'),

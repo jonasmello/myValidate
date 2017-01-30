@@ -16,7 +16,62 @@ In your web page:
 <script src="dist/myValidate.min.js"></script>
 <script>
 jQuery(function($) {
-  $('.myValidate').myValidate();
+  $('.myValidate').myValidate({
+    debug: false, // Enable / disable debugging plugin
+    error: "Some required fields are empty.", // Error message for empty field
+    errorattach: "It is necessary to attach a file.", // Error message for file
+    errormail: "Please enter a valid email address.", // Error message for email
+    errorcpf: "CPF Inválido", // Error message for CPF
+    errorcnpj: "CNPJ Inválido", // Error message for CNPJ
+    erroequal: "Campos {0} e {1} não são iguais", // Error message for equal fields
+    required: "required", // Parameter that defines whether the field is required
+    notification: ".notification", // Class for notification
+    errorcolor: "#F00", // Error color
+    notdisabled: true, // Does not return fields with disabled
+    bind: 'keyup change',
+    changeBackground: true,
+    backgrounds: [
+        ['#cc0000', '#FFF'],
+        ['#cc3333', '#FFF'],
+        ['#cc6666', '#FFF'],
+        ['#ff9999', '#FFF'],
+        ['#e0941c', '#FFF'],
+        ['#e8a53a', '#FFF'],
+        ['#eab259', '#FFF'],
+        ['#efd09e', '#FFF'],
+        ['#ccffcc', '#FFF'],
+        ['#66cc66', '#FFF'],
+        ['#339933', '#FFF'],
+        ['#006600', '#FFF'],
+        ['#105610', '#FFF']
+    ],
+    passwordValidFrom: 60, // 60%
+    onValidatePassword: function(percentage) {
+      if (this.debug) {
+        console.log(percentage);
+      }
+    },
+    onPasswordStrengthChanged: function(passwordStrength, percentage) {
+      if (this.debug) {
+        console.log(passwordStrength, percentage);
+      }
+    },
+    // Function performed before validation
+    beforeValidate: function() {},
+    // Function executed when error occurred
+    callError: function(event, el, status) {
+      if (this.debug) {
+        console.log(event, el, status);
+      }
+      el.find('.notification').slideDown();
+    },
+    // Function performed when there is no error
+    callSuccess: function(event, el, status) {
+      if (this.debug) {
+        console.log(event, el, status);
+      }
+    }
+  });
 });
 </script>
 ```
@@ -58,6 +113,9 @@ $(function () {
 Online example: [myValidate][example]
 
 ## Release History
+
+* **v2.4.1** - 2017-01-30
+   - Fix bug ```validatePassword```
 
 * **v2.4.0** - 2017-01-20
    - Add ```validatePassword```

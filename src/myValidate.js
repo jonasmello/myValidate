@@ -283,8 +283,8 @@
               .validateDoc($this)
               .validateSelect($this)
               .validateCheckbox($this)
-              .validateEqual($this)
-              .validatePassword($this);
+              .validatePassword($this)
+              .validateEqual($this);
         }
       });
     }
@@ -620,7 +620,7 @@
         return passwordStrength;
       };
 
-      return field.each($.proxy(function (idx, pStrengthElement) {
+      field.each($.proxy(function (idx, pStrengthElement) {
 
           pStrengthElementsDefaultStyle[$(pStrengthElement)] = {
               'background': $(pStrengthElement).css('background'),
