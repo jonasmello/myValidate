@@ -114,6 +114,9 @@ Online example: [myValidate][example]
 
 ## Release History
 
+* **v2.5** - 2017-01-30
+   - Add option class to custom error
+
 * **v2.4.1** - 2017-01-30
    - Fix bug ```validatePassword```
 

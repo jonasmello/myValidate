@@ -80,6 +80,7 @@
     erroequal: "Campos {0} e {1} não são iguais", // Mensagem de error para campos iguais
     required: "required", // Parametro que define se o campo é obrigatório
     notification: ".notification", // class para notificação
+    class: 'error', // class error
     errorcolor: "#F00", // cor do erro
     notdisabled: true, // Não retorna campos com disabled
     bind: 'keyup change',
@@ -267,15 +268,15 @@
         var $this = $(this);
         if ($this.not(':disabled') || !$this.attr('disabled')) {
           if ($this.data('myrules') === '')  { $this.data('myrules', 'required'); }
-          $this.removeClass('error');
-          $this.parent().removeClass('error');
+          $this.removeClass(self.options.class);
+          $this.parent().removeClass(self.options.class);
           //chozen
           $this.next('.chzn-container')
-            .removeClass('error');
+            .removeClass(self.options.class);
           // select2
           $this.next('.select2-container')
             .find('.select2-selection')
-            .removeClass('error');
+            .removeClass(self.options.class);
           self.isRequired($this)
               .validateEmail($this)
               .validateCpf($this)
@@ -342,7 +343,7 @@
     if (field.val() === '' || field.val() === null) {
       this.callbackSubmit = false;
       this.notification(this.options.error);
-      field.addClass('error');
+      field.addClass(this.options.class);
       this.notFile(field);
     }
     return this;
@@ -357,9 +358,9 @@
     if (field.is('input[type="file"]')) {
       this.notification(this.options.errorattach);
       this.callbackSubmit = false;
-      field.parent().addClass('error')
+      field.parent().addClass(this.options.class)
         .find('.label')
-        .addClass('error');
+        .addClass(this.options.class);
       this.notification(this.options.errorattach);
     }
     return this;
@@ -375,7 +376,7 @@
       var expressao_regular = /^[\d\w]+([_.-]?[\d\w]+)*@([\d\w_-]{2,}(\.){1})+?[\d\w]{2,4}$/;
       if (!expressao_regular.test(field.val())) {
         this.callbackSubmit = false;
-        field.addClass('error');
+        field.addClass(this.options.class);
         this.notification(this.options.errormail);
       }
     }
@@ -391,7 +392,7 @@
     if (field.filter('[data-myrules*="cpf"]').length) {
       if (!this.validarCPF(field.val())) {
         this.callbackSubmit = false;
-        field.addClass('error');
+        field.addClass(this.options.class);
         this.notification(this.options.errorcpf);
       }
     }
@@ -407,7 +408,7 @@
     if (field.filter('[data-myrules*="cnpj"]').length) {
       if (!this.validarCNPJ(field.val())) {
         this.callbackSubmit = false;
-        field.addClass('error');
+        field.addClass(this.options.class);
         this.notification(this.options.errorcnpj);
       }
     }
@@ -426,13 +427,13 @@
       if (qty > 11) {
         if (!this.validarCNPJ(field.val())) {
           this.callbackSubmit = false;
-          field.addClass('error');
+          field.addClass(this.options.class);
           this.notification(this.options.errorcnpj);
         }
       } else {
         if (!this.validarCPF(field.val())) {
           this.callbackSubmit = false;
-          field.addClass('error');
+          field.addClass(this.options.class);
           this.notification(this.options.errorcpf);
         }
       }
@@ -450,14 +451,14 @@
       this.callbackSubmit = false;
       this.notification(this.options.error);
       // select
-      field.addClass('error');
+      field.addClass(this.options.class);
       //chozen
       field.next('.chzn-container')
-        .addClass('error');
+        .addClass(this.options.class);
       // select2
       field.next('.select2-container')
         .find('.select2-selection')
-        .addClass('error');
+        .addClass(this.options.class);
     }
     return this;
   };
@@ -469,7 +470,7 @@
    */
   $.myValidate.prototype.validateCheckbox = function(field) {
     if (field.is('input[type="checkbox"]') && !field.is('input:checked')) {
-      field.parent().addClass('error');
+      field.parent().addClass(this.options.class);
       this.callbackSubmit = false;
       this.notification(this.options.errormail);
     }
@@ -494,8 +495,8 @@
       if (compare.val() !== '' && compare.val() !== field.val()) {
         this.callbackSubmit = false;
         this.notification(this.options.erroequal.format(field_title, compare_title));
-        field.addClass('error');
-        compare.addClass('error');
+        field.addClass(this.options.class);
+        compare.addClass(this.options.class);
       }
     }
     return this;
