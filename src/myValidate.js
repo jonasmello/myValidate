@@ -235,6 +235,9 @@
     $(el + ' [onclick*="submit()"]').each(function(key, val) {
       $(val).attr('onclick', "javascript:$('" + el + "').myValidate().submit();");
     });
+    $(el + ' [data-submit]').each(function(key, val) {
+      $(val).attr('onclick', "javascript:$('" + el + "').myValidate().submit();");
+    });
   };
 
   /**
