@@ -1,0 +1,22 @@
+{
+  "name": "myValidate",
+  "version": "2.5",
+  "main": [
+    "dist/myValidate.min.js"
+  ],
+  "homepage": "https://github.com/jonasmello/myValidate",
+  "license": "MIT",
+  "description": "Form validation with jQuery",
+  "authors": [
+    "Jonas Mello <jonas@ekg.com.br>",
+    "Ramon Barros <contato@ramon-barros.com>"
+  ],
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "test",
+    "tests",
+    "app",
+    "src"
+  ]
+}

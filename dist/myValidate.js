@@ -1,4 +1,4 @@
-/*! myValidate - v2.5 - 2017-01-30
+/*! myValidate - v2.5 - 2017-02-21
 * https://github.com/jonasmello/myValidate
 * Copyright (c) 2017 Jonas Mello; Licensed MIT */
 // o ponto-e-vírgula antes de invocar a função é uma prática segura contra scripts
@@ -47,7 +47,7 @@
 
   // Static method.
   $.myValidate = function(element, options) {
-    this.version = '2.3';
+    this.version = '2.5';
     this.element = element;
     this.callbackSubmit = true; // Utilizado para bloquear o submit do formulário
     this.options = $.extend({}, $.myValidate.options, options);
