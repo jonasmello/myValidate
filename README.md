@@ -16,8 +16,10 @@ In your web page:
 <script src="dist/myValidate.min.js"></script>
 <script>
 jQuery(function($) {
-  $('.myValidate').myValidate({
+  var myvalidate = $('.myValidate').myValidate({
     debug: false, // Enable / disable debugging plugin
+    instance: true, // Returns an instance of the plugin
+    removeData: true, // Remove existing instance (util for looping)
     error: "Some required fields are empty.", // Error message for empty field
     errorattach: "It is necessary to attach a file.", // Error message for file
     errormail: "Please enter a valid email address.", // Error message for email
@@ -72,6 +74,9 @@ jQuery(function($) {
       }
     }
   });
+
+  // Reset myValidate to fetch dynamic elements
+  myvalidate.reset();
 });
 </script>
 ```
