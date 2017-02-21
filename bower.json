@@ -1,5 +1,5 @@
 {
-  "name": "myValidate",
+  "name": "myvalidate",
   "version": "2.5",
   "main": [
     "dist/myValidate.min.js"
