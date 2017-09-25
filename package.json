@@ -1,19 +1,37 @@
 {
   "name": "myValidate",
-  "version": "2.5",
+  "title": "myValidate",
+  "description": "Form validation with jQuery",
+  "main": "index.js",
+  "repository": "https://github.com/jonasmello/myValidate",
+  "bugs": "https://github.com/jonasmello/myValidate/issues",
+  "author": {
+    "name": "Jonas Mello",
+    "email": "jonas@mello.com",
+    "url": "http://ekg.com.br/myValidate"
+  },
+  "version": "2.5.1",
+  "license": "MIT",
   "engines": {
     "node": ">= 0.8.0"
   },
+  "dependencies": {
+    "jquery": "*"
+  },
   "devDependencies": {
+    "grunt": "~0.4.2",
+    "grunt-contrib-clean": "~0.4.0",
+    "grunt-contrib-concat": "~0.3.0",
     "grunt-contrib-jshint": "~0.6.0",
     "grunt-contrib-qunit": "~0.2.0",
-    "grunt-contrib-concat": "~0.3.0",
     "grunt-contrib-uglify": "~0.2.0",
     "grunt-contrib-watch": "~0.4.0",
-    "grunt-contrib-clean": "~0.4.0",
-    "grunt-qunit-istanbul": "~0.3.0",
-    "grunt": "~0.4.2"
+    "grunt-qunit-istanbul": "~0.3.0"
   },
+  "files": [
+    "css/*.css",
+    "dist/*.js"
+  ],
   "scripts": {
     "build": "npm install && grunt",
     "test": "grunt qunit"
