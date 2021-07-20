@@ -1,3 +1,5 @@
+# **DEPRECATED** - no longer actively maintained
+
 # myValidate
 
 Form validation with jQuery
